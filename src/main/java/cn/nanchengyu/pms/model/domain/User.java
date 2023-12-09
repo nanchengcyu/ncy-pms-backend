@@ -1,9 +1,6 @@
 package cn.nanchengyu.pms.model.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,7 +17,7 @@ public class User implements Serializable {
      * id
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private long id;
 
     /**
      * 用户昵称
@@ -30,12 +27,12 @@ public class User implements Serializable {
     /**
      * 账号
      */
-    private String useraccount;
+    private String userAccount;
 
     /**
      * 用户头像
      */
-    private String avatarurl;
+    private String avatarUrl;
 
     /**
      * 性别
@@ -45,7 +42,7 @@ public class User implements Serializable {
     /**
      * 密码
      */
-    private String userpassword;
+    private String userPassword;
 
     /**
      * 电话
@@ -58,40 +55,42 @@ public class User implements Serializable {
     private String email;
 
     /**
+     * 标签列表 json
+     */
+    private String tags;
+
+    /**
      * 状态 0 - 正常
      */
-    private Integer userstatus;
+    private Integer userStatus;
 
     /**
      * 创建时间
      */
-    private Date createtime;
+    private Date createTime;
 
     /**
-     * 
+     *
      */
-    private Date updatetime;
+    private Date updateTime;
 
     /**
      * 是否删除
      */
-    private Integer isdelete;
+    @TableLogic
+    private Integer isDelete;
 
     /**
      * 用户角色 0 - 普通用户 1 - 管理员
      */
-    private Integer userrole;
+    private Integer userRole;
 
     /**
      * 星球编号
      */
-    private String planetcode;
-
-    /**
-     * 标签 json 列表
-     */
-    private String tags;
+    private String planetCode;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
 }
