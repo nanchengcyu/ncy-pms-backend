@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  */
 @SpringBootApplication
 @MapperScan("cn.nanchengyu.pms.mapper")
-@CrossOrigin
+//@CrossOrigin
 public class PmsApplication {
 
     public static void main(String[] args) {
