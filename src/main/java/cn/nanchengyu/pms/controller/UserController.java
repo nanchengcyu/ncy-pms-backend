@@ -1,7 +1,6 @@
 package cn.nanchengyu.pms.controller;
 
 
-
 import cn.nanchengyu.pms.common.BaseResponse;
 import cn.nanchengyu.pms.common.ErrorCode;
 import cn.nanchengyu.pms.common.ResultUtils;
@@ -13,32 +12,39 @@ import cn.nanchengyu.pms.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
 import static cn.nanchengyu.pms.contant.UserConstant.USER_LOGIN_STATE;
 
 
-
 /**
  * 用户接口
- *
  */
 @Api(tags = "user管理接口")
 @RestController
 @RequestMapping("/user")
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost:3000"})
+//@CrossOrigin(origins = {"http://localhost:3000"}) //此处是跨域处理 ，可以在这个地方处理 或者在nginx.conf中处理 如果在本地运行项目可以在此处处理
+@Slf4j
 public class UserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
 
     /**
      * 用户注册
@@ -146,10 +152,9 @@ public class UserController {
     }
 
 
-
     @GetMapping("/search/tags")
-    public BaseResponse<List<User>> searchUserByTages(@RequestParam(required = false) List<String> tagNameList){
-        if (CollectionUtils.isEmpty(tagNameList)){
+    public BaseResponse<List<User>> searchUserByTages(@RequestParam(required = false) List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         List<User> userList = userService.searchUserByTags(tagNameList);
@@ -157,16 +162,49 @@ public class UserController {
     }
 
     @PostMapping("/update")
-        public BaseResponse<Integer> updateUser(@RequestBody User user,HttpServletRequest request){
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         //1.校验参数是否为空
-        if (user == null){
+        if (user == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
 
-        Integer result = userService.updateUser(user,loginUser);
+        Integer result = userService.updateUser(user, loginUser);
         return ResultUtils.success(result);
     }
 
+    @GetMapping("/recommend")
+    public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+////        List<User> userList = userService.list(queryWrapper);
+////        List<User> list = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+////        return ResultUtils.success(list);
+
+        //改为分页推荐，否则数据量大前端可能报错
+
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        Page<User> userList = userService.page(new Page<>(pageNum , pageSize), queryWrapper);
+//        return ResultUtils.success(userList);
+
+        //Redis方法
+        User loginUser = userService.getLoginUser(request);
+        String redisKey = String.format("pms:user:recommend:%s", loginUser.getId());
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        //如果有缓存，直接读取
+        Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+        if (userPage != null){
+            return ResultUtils.success(userPage);
+        }
+        //无缓存，查数据库
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        userPage = userService.page(new Page<>(pageNum , pageSize), queryWrapper);
+        try {
+            valueOperations.set(redisKey,userPage,60000, TimeUnit.MILLISECONDS);
+        }
+        catch (Exception e){
+            log.error("redis set key error",e);
+        }
+        return ResultUtils.success(userPage);
+    }
 
 }
