@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
  */
 @SpringBootApplication
 @MapperScan("cn.nanchengyu.pms.mapper")
-//@CrossOrigin
 @EnableScheduling
 public class PmsApplication {
 

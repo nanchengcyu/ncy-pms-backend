@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 缓存预热任务
+ * 缓存预热任务 引入Redisson看门狗机制
  *
  */
 @Component
@@ -38,8 +40,8 @@ public class PreCacheJob {
 
     // 每天执行，预热推荐用户
     @Scheduled(cron = "0 31 0 * * *")//z这个可以在工具网站生成
-    public void doCacheRecommendUser() {
-        RLock lock = redissonClient.getLock("yupao:precachejob:docache:lock");
+     public void doCacheRecommendUser() {
+        RLock lock = redissonClient.getLock("pms:precachejob:docache:lock");
         try {
             // 只有一个线程能获取到锁
             if (lock.tryLock(0, -1, TimeUnit.MILLISECONDS)) {
