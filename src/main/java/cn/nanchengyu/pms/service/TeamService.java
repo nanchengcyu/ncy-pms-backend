@@ -2,7 +2,13 @@ package cn.nanchengyu.pms.service;
 
 import cn.nanchengyu.pms.model.domain.Team;
 import cn.nanchengyu.pms.model.domain.User;
+import cn.nanchengyu.pms.model.domain.dto.TeamQuery;
+import cn.nanchengyu.pms.model.domain.request.TeamJoinRequest;
+import cn.nanchengyu.pms.model.domain.request.TeamUpdateRequest;
+import cn.nanchengyu.pms.model.domain.vo.TeamUserVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author nanchengyu
@@ -17,4 +23,22 @@ public interface TeamService extends IService<Team> {
      * @return
      */
     long addTeam(Team team, User loginUser);
+
+    /**
+     * 搜索队伍
+     * @param teamQuery
+     * @return
+     */
+    List<TeamUserVO> listTeams(TeamQuery teamQuery,boolean isAdmin);
+
+    /**
+     * 更新队伍情况
+     *
+     * @param teamUpdateRequest
+     * @param loginUser
+     * @return
+     */
+    boolean updateTeam(TeamUpdateRequest teamUpdateRequest,User loginUser);
+
+    boolean joinTeam(TeamJoinRequest teamJoinRequest,User loginUser);
 }
