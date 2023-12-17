@@ -4,6 +4,7 @@ import cn.nanchengyu.pms.model.domain.Team;
 import cn.nanchengyu.pms.model.domain.User;
 import cn.nanchengyu.pms.model.domain.dto.TeamQuery;
 import cn.nanchengyu.pms.model.domain.request.TeamJoinRequest;
+import cn.nanchengyu.pms.model.domain.request.TeamQuitRequest;
 import cn.nanchengyu.pms.model.domain.request.TeamUpdateRequest;
 import cn.nanchengyu.pms.model.domain.vo.TeamUserVO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -41,4 +42,19 @@ public interface TeamService extends IService<Team> {
     boolean updateTeam(TeamUpdateRequest teamUpdateRequest,User loginUser);
 
     boolean joinTeam(TeamJoinRequest teamJoinRequest,User loginUser);
+
+    /**
+     * 推出队伍
+     * @param teamQuitRequest
+     * @param loginUser
+     * @return
+     */
+    boolean quitTeam(TeamQuitRequest teamQuitRequest, User loginUser);
+
+    /**
+     * 删除队伍
+     * @param id
+     * @return
+     */
+    boolean deleteTeam(long id);
 }

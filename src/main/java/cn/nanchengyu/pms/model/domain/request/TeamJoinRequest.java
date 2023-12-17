@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class TeamJoinRequest implements Serializable {
 
     //当一个类实现了 Serializable 接口时，表示该类的对象可以被序列化，即可以被转换成字节流，从而可以在网络上传输或者持久化到磁盘。
-    // 当一个类实现了 Serializable 接口时，表示该类的对象可以被序列化，即可以被转换成字节流，从而可以在网络上传输或者持久化到磁盘。
+
     private static final long serialVersionUID = 3191241716373120793L;
 
     /**
