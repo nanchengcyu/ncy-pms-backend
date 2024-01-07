@@ -144,5 +144,27 @@ public class TeamController {
         return ResultUtils.success(true);
     }
 
+    /**
+     * 获取我创建的队伍
+     * @param teamQuery
+     * @param request
+     * @return
+     */
+
+    @GetMapping("/list/my")
+    public BaseResponse<List<TeamUserVO>> listMyTeams(TeamQuery teamQuery,HttpServletRequest request){
+        if (teamQuery == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        boolean isAdmin = userService.isAdmin(loginUser);
+        teamQuery.setUserId(loginUser.getId());
+        List<TeamUserVO> teamList = teamService.listTeams(teamQuery, true);
+        return ResultUtils.success(teamList);
+    }
+
+
+
+
 
 }
